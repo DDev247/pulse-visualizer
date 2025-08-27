@@ -273,7 +273,7 @@ void drawText(const char* text, const float& x, const float& y, const float& siz
     const char& c = *p;
     if (c == '\n') {
       _x = x;
-      _y += size;
+      _y -= size;
       continue;
     }
 
@@ -314,15 +314,16 @@ std::pair<float, float> getTextSize(const char* text, const float& size, size_t 
     return {0.0f, 0.0f};
 
   float totalWidth = 0.0f;
-  float maxHeight = 0.0f;
+  float totalHeight = 0.0f;
   float currentLineWidth = 0.0f;
-  float lineHeight = size;
 
   for (const char* p = text; *p; p++) {
     const char& c = *p;
     if (c == '\n') {
       totalWidth = std::max(totalWidth, currentLineWidth);
       currentLineWidth = 0.0f;
+
+      totalHeight += size;
       continue;
     }
 
@@ -331,11 +332,11 @@ std::pair<float, float> getTextSize(const char* text, const float& size, size_t 
       continue;
 
     currentLineWidth += static_cast<float>(glyph.advance);
-    maxHeight = std::max(maxHeight, static_cast<float>(glyph.height));
   }
 
   totalWidth = std::max(totalWidth, currentLineWidth);
-  return {totalWidth, maxHeight};
+  totalHeight += size;
+  return {totalWidth, totalHeight};
 }
 
 } // namespace Font

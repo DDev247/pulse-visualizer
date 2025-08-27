@@ -20,6 +20,7 @@
 #include "include/audio_engine.hpp"
 #include "include/common.hpp"
 #include "include/config.hpp"
+#include "include/config_window.hpp"
 #include "include/dsp.hpp"
 #include "include/graphics.hpp"
 #include "include/sdl_window.hpp"
@@ -31,8 +32,8 @@
 #include <SDL3/SDL_main.h>
 
 #if not(_WIN32)
-#include <sys/ptrace.h>
 #include <errno.h>
+#include <sys/ptrace.h>
 #endif
 
 namespace CmdlineArgs {
@@ -65,7 +66,7 @@ bool debuggerPresent() {
   return IsDebuggerPresent();
 #else
   errno = 0;
-  
+
   // try to trace, will fail if a debugger is present
   if (ptrace(PTRACE_TRACEME, 0, nullptr, nullptr) == -1) {
     return errno == EPERM;
@@ -247,6 +248,7 @@ int main(int argc, char** argv) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       SDLWindow::handleEvent(event);
+      ConfigWindow::handleEvent(event);
       WindowManager::handleEvent(event);
       for (auto& [key, vec] : WindowManager::splitters)
         for (auto& splitter : vec)
@@ -282,6 +284,7 @@ int main(int argc, char** argv) {
     SDLWindow::clear();
     WindowManager::renderAll();
     WindowManager::drawSplitters();
+    ConfigWindow::draw();
     SDLWindow::display();
 
     // Update timing
